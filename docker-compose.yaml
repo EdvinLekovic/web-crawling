@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  app:
+    build: ./app/
+    env_file:
+      - .env/.env
+    ports:
+      - "8080:8080"
+    restart: "no"
+    depends_on:
+      - db
+    command: uvicorn apartments-app:app --reload --workers 1 --host 0.0.0.0 --port 8080
+  db:
+    build: ./database/
+    ports:
+      - "5432:5432"
+    environment:
+       - POSTGRES_USER=${DB_USER}
+       - POSTGRES_PASSWORD=${DB_PASSWORD}
+       - POSTGRES_DB=${DB_NAME}
+       - POSTGRES_HOST=${DB_HOST}
+    volumes:
+      - apartments-db:/var/lib/postgresql/data
+
+volumes:
+  apartments-db:
