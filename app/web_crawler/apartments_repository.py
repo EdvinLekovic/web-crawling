@@ -11,7 +11,7 @@ class ApartmentsRepository:
         self.__db_host = os.environ['DB_HOST']
         self.__db_port = os.environ['DB_PORT']
         self.__db_string = f'postgresql://{self.__db_user}:{self.__db_password}@{self.__db_host}:{self.__db_port}/{self.__db_name}'
-        self.__db_string = 'postgresql://postgres:postgres@db:5432/apartmentsDB'
+        #self.__db_string = 'postgresql://postgres:postgres@db:5432/apartmentsDB'
         self.__db = create_engine(self.__db_string)
 
     def create_apartments_table(self):

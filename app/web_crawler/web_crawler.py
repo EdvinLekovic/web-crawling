@@ -22,21 +22,24 @@ class WebCrawler:
     def __find_n_apartments(self, url, num_apartments):
         soup = self.__fetch_page(url)
         all_apartments = soup.find_all(class_='property ng-scope')
-        # for page_number in range(2, 500):
-        #     query_param = '?page=' + str(page_number)
-        #     soup = self.__fetch_page(url + query_param)
-        #     apartments = soup.find_all(class_='property ng-scope')
-        #     all_apartments.extend(apartments)
-        #     #print(len(all_apartments))
-        #     if len(all_apartments) == num_apartments:
-        #         break
+
+        for page_number in range(2, 500):
+            query_param = '?page=' + str(page_number)
+            soup = self.__fetch_page(url + query_param)
+            apartments = soup.find_all(class_='property ng-scope')
+            all_apartments.extend(apartments)
+            #print(len(all_apartments))
+            if len(all_apartments) == num_apartments:
+                break
         return all_apartments
 
     def __save_apartments(self, url, num_apartments):
         all_apartments = self.__find_n_apartments(url, num_apartments)
-        for apartment in all_apartments:
-            images = apartment.find_all('img')
-            title = apartment.find('span',{'class':'name'})
+        if len(all_apartments) < num_apartments:
+            num_apartments = len(all_apartments)
+        for i in range(0, num_apartments):
+            images = all_apartments[i].find_all('img')
+            title = all_apartments[i].find('span',{'class':'name'})
             apartment_object = {'title': title.text}
             images_list = []
             for image in images:
@@ -48,13 +51,9 @@ class WebCrawler:
             self.apartments_repository.add_new_apartment(apartment_object['title'], apartment_object['images'])
 
     def fetch_web_data(self, url, num_apartments):
-        self.apartments_repository.create_apartments_table()
-        self.__save_apartments(url, num_apartments)
-        # if self.apartments_repository.count_apartments() != 500:
-        #     self.apartments_repository.create_apartments_table()
-        #     self.__save_apartments(url, num_apartments)
+        if self.apartments_repository.count_apartments() < num_apartments:
+            self.apartments_repository.create_apartments_table()
+            self.__save_apartments(url, num_apartments)
 
     def get_all_apartments(self):
         return self.apartments_repository.get_all_apartments()
-
-
